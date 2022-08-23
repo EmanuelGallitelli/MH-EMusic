@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+        <link rel="stylesheet" href="./styles/animations.css">
+        <link rel="stylesheet" href="./styles/styles.css">
+        <title>About Us</title>
+    </head>
+    <body>
+        <div id="app">
+            <!----------------------------- HEADER ----------------------------->
+            <div v-show="charging==true" class="header black">
+                <div class="preloader--container fade-out">
+                  <div
+                    class="heartbeat d-flex align-items-center justify-content-center"
+                  >
+                    <img src="./assets/logo-01.png" class="w-50 h-50 p-3" alt="logo" />
+                  </div>
+                  <div class="spinner">
+                    <span>L</span>
+                    <span>E</span>
+                    <span>T</span>
+                    <span>S</span>
+                    <span></span>
+                    <span>R</span>
+                    <span>O</span>
+                    <span>C</span>
+                    <span>K</span>
+                    <span>!</span>
+                  </div>
+                </div>
+              </div>
+              <div v-show="charging==false">
+                <header class="header bg-about">
+                    <nav class="nav slide-bottom">
+                        <a href="./index.html"><img src="./assets/logo-nav.png" alt="logo" id="logo" class="logo-header"></a>
+                        <div>
+                            <a class="underline-hover-effect ms-3 me-3" href="./index.html">Home</a>
+                            <a class="underline-hover-effect ms-3 me-3" href="./courses.html">Courses</a>
+                            <a class="underline-hover-effect ms-3 me-3" href="./merchandise.html">Merchandise</a>
+                            <a class="underline-hover-effect ms-3 me-3" href="./aboutUs.html">About us</a>
+                        </div>
+                        <div v-if="!isLogin">
+                            <a  href="./login.html" id="btn-login">Login</a>
+                        </div>
+                        <div v-else class="student-cart-container">
+                            <!------------------- Shop Car--------------------->
+                            <div class="cart">
+                                <div class="cart-amount">{{merchscart.length + coursescart.length}}</div>
+                                <!-- <img src="/assets/cart-01.png"> -->
+                                <a type="button" data-bs-toggle="offcanvas" href="#offcanvasRight" aria-controls="offcanvasExample">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-shopping-cart" width="32"
+                                      height="32" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round"
+                                      stroke-linejoin="round">
+                                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                      <circle cx="6" cy="19" r="2" />
+                                      <circle cx="17" cy="19" r="2" />
+                                      <path d="M17 17h-11v-14h-2" />
+                                      <path d="M6 5l14 1l-1 7h-13" />
+                                    </svg>
+                                  </a>
+                  
+                                  <!-- ---------------------offcanvas shop car ---------------------------- -->
+                                  <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+                                    <div class="offcanvas-header">
+                                      <h5 id="offcanvasRightLabel" class="font fs-2">My cart</h5>
+                                      <i class="fa-solid fa-x deletes fs-2" v-on:click="deleteCartMerchs(merch)" data-bs-dismiss="offcanvas" aria-label="Close"></i>
+                                    </div>
+                                    <div class="offcanvas-body ">
+                                      <table class="table">
+                                        <thead>
+                                          <tr>
+                                            <th scope="col">Name</th>
+                                            <th scope="col" class="text-center">Price</th>
+                                            <th scope="col" class="text-center">Units</th>
+                                            <th scope="col" class="text-center">Subtotal</th>
+                                            <th scope="col" class="text-center">Remove</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          <tr v-for="merch in merchscart">
+                                            <td>{{merch.type}}</td>
+                                            <td class="text-center">${{merch.price}}</td>
+                                            <td><div id="contador" class="d-flex align-items-baseline justify-content-center">
+                                              <i class="fa-solid fa-minus me-2 deletes" v-on:click="disminuirUnidadesAComprar(merch)"></i>
+                                              <p class="text-center">{{merch.unidadesAComprar}}</p>
+                                              <i class="fa-solid fa-plus ms-2 text-center deletes" v-on:click="aumentarUnidadesAComprar(merch)"></i>
+
+                                            </div></td>
+                                            <td class="text-center">${{calcularSubtotalMerch(merch)}}</td>
+                                            <td class="text-center"><i class="fa-solid fa-x deletes" v-on:click="deleteCartMerchs(merch)"></i></td>
+                                          </tr>
+                                          <tr v-for="course in coursescart">
+                                            <td>{{course.name}}</td>
+                                            <td class="text-center">${{course.price}}</td>
+                                            <td></td>
+                                            <td class="text-center">${{calcularSubtotalCourse(course)}}</td>
+                                            <td class="text-center"><i class="fa-solid fa-x deletes " v-on:click="deleteCartCourse(course)"></i></td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                        <h4 class="mb-4"> Total to pay: ${{obtenerPrecioTotal()}}</h4>
+                                      <a href="./checkout.html" class="checkout">Finish purchase</a>
+                                    </div>
+                                  </div>
+                             
+                            </div>
+                            <div class="student-header-container">
+                                <p>{{firstName}}  {{lastName}}</p>
+                                <img :src="`./assets/${firstName.toLowerCase()}.png`" alt="student" >
+                                <ul >
+                                    <li @click="logout" class="d-flex justify-content-between align-items-center"><i class="fa-solid fa-right-from-bracket me-2"></i><p>Logout</p></li>
+                                    <li class="d-flex justify-content-between align-items-center"> <a href="./students.html">Dashboard</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </nav>
+                    <div class="header-container-title slide-top">
+                        <h1 class="header-title">Who <span class="font">we </span> are ?</h1>
+                        <h2 class="header-title">Our essence... </h2>
+                    </div>
+                </header>
+                
+                <!----------------------------- MAIN ---------------------------->
+                <main id="main-about">
+                    <section class="staff hidden">
+                        <img src="./assets/we-are.png" class="we-are">
+                        <div class="we-are-paragraph">
+                            <h3 class="red">The Crew</h3>
+                            <h2 class="bold">A bounch of crazy miusic lovers</h2>
+                            <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Phasellus hendrerit.
+                                In nisi neque, aliquet vel, nisi. Sed pretium, ligula sollicitudin laoreet viverra,
+                                tortor libero sodales leo, eget blandit nunc tortor eu nibh. Suspendisse potenti.</p>
+                            <p>Sed egestas, ante et vulputate volutpat, eros pede semper est, vitae luctus metus libero eu augue. 
+                                Morbi purus libero, faucibus adipiscing, commodo quis, gravida id, est. Sed lectus. 
+                                Praesent elementum hendrerit tortor mi neque euismod dui, eu pulvinar nunc sapien 
+                                ornare nisl. Phasellus pede arcu, dapibus sed, urna.</p>
+                            <div>
+                                <img src="./assets/jackson.png" class="mt-2">
+                                <p class="bold mt-2">Newman S. Jackson</p>
+                                <p>CEO EMusic</p>
+                            </div>
+                        </div>
+                        
+                    </section>
+    
+                    <section class="phrase hidden">
+                        <h2 class="yellowtail">"The miusic have the power to reunite souls."</h2>
+                        <h4>- John Lennon</h4>
+                        <div class="phrase-paragraph">
+                            <h3 class="red">Our Values</h3>
+                            <h2 class="bold">This are our values ang golas</h2>
+                            <p class="text-center">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Phasellus hendrerit.
+                                In nisi neque, aliquet vel, nisi. Sed pretium, ligula sollicitudin laoreet viverra,
+                                tortor libero sodales leo, eget blandit nunc tortor eu nibh. Suspendisse potenti.</p>
+                            <p class="text-center">Sed egestas, ante et vulputate volutpat, eros pede semper est, vitae luctus metus libero eu augue. 
+                                Morbi purus libero, faucibus adipiscing, commodo quis, gravida id, est. Sed lectus. 
+                                Praesent elementum hendrerit tortor mi neque euismod dui, eu pulvinar nunc sapien 
+                                ornare nisl. Phasellus pede arcu, dapibus sed, urna.</p>
+                        </div>
+                    </section>
+                    <section class="numbers hidden">
+                        <div class="numbers-container">
+                            <div class="numbers-container-item">
+                                <img src="./assets/number-icons-01.png" class="icon-number">
+                                <p class="bold mb-0 mt-2">7</p>
+                                <p>Awards</p>
+                            </div>
+                            <div class="numbers-container-item">
+                                <img src="./assets/number-icons-02.png" class="icon-number">
+                                <p class="bold mb-0 mt-2">578</p>
+                                <p>Graduates</p>
+                            </div>
+                            <div class="numbers-container-item">
+                                <img src="./assets/number-icons-03.png" class="icon-number">
+                                <p class="bold mb-0 mt-2">46</p>
+                                <p>Profesionals</p>
+                            </div>
+                            <div class="numbers-container-item">
+                                <img src="./assets/number-icons-04.png" class="icon-number">
+                                <p class="bold mb-0 mt-2">3</p>
+                                <p>Endorsements</p>
+                            </div>
+                        </div>
+                    </section>
+                </main>
+
+            <!----------------------------- FOOTER ----------------------------->
+            <footer class="container-footer">
+
+                <div class="container-footer-col#1 col-3">
+                    <img src="./assets/logo-nav.png" alt="logo" class="mb-4">
+                    <ul class="d-flex flex-column gap-3 p-0">
+                        <li>Copyright © 2021.</li>
+                        <li>Emusic All rights reserved.</li>
+                        <li class="d-flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-map-pin" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ce0202" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <circle cx="12" cy="11" r="3" />
+                                <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z" />
+                            </svg>
+                            Jl. Sunset Road No.815, Kuta.
+                        </li>
+                        <li class="d-flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-mail" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ce0202" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <rect x="3" y="5" width="18" height="14" rx="2" />
+                                <polyline points="3 7 12 13 21 7" />
+                            </svg>
+                            support@emusic.com
+                        </li>
+                        <li class="d-flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-phone-call" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ce0202" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2" />
+                                <path d="M15 7a2 2 0 0 1 2 2" />
+                                <path d="M15 3a6 6 0 0 1 6 6" />
+                            </svg>(+62)81 6754 345
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="container-footer-col#2 col-3">
+                    <ul class="d-flex flex-column gap-3 p-0">
+                        <h3 class="bold">GOT LOST?</h3>
+                        <li><a href="http://">Home</a></li>
+                        <li><a href="http://">Student's Profile</a></li>
+                        <li><a href="http://">Teacher's Room</a></li>
+                        <li><a href="http://">Courses</a></li>
+                        <li><a href="http://">Merchandise</a></li>
+                        <li><a href="http://">About Us</a></li>
+                    </ul>
+                </div>
+
+                <div class="container-footer-col#3 col-3">
+                    <ul class="d-flex flex-column gap-3 p-0">
+                        <h3 class="bold">ABOUT EMUSIC</h3>
+                        <li><a href="http://">FAQ</a></li>
+                        <li><a href="http://">Privicy Policy</a></li>
+                        <li><a href="http://">Terms & Condition</a></li>
+                        <li><a href="http://">Support</a></li>
+                    </ul>
+                </div>
+
+                <div class="container-footer-col#4 col-3">
+                    <h3 class="bold">FOLLOW US</h3>
+                    <ul class="d-flex gap-4 p-0">
+                        <li><a href="https://www.facebook.com/profile.php?id=100083025423365"><img src="./assets/facebook.png" alt="facebook" class="social"></a></li>
+                        <li><a href="https://www.instagram.com/emusicmindhub/"><img src="./assets/instagram.png" alt="instagram" class="social"></a></li>
+                        <li><a href="https://twitter.com/EMusicMindHub"><img src="./assets/twitter.png" alt="twitter" class="social"></a></li>
+                        <li><a href="https://www.youtube.com/channel/UC2nJJf25rRyHdYqcdxUoMwQ"><img src="./assets/youtube.png" alt="youtube" class="social"></a></li>
+                    </ul>
+                    <form class="subscribe-footer">
+                        Subscribe our Newsletter
+                        <input type="email" placeholder="@" class="newsletter-input">
+                        <div class="subscribe-btns">
+                            <button type="button" class="buscribe-btn" v-on:click="subscribeEmail()">Subscribe</button>
+                        </div>
+                    </form>
+                </div>
+
+            </footer>
+
+              {{scroll}}
+            {{ headershow }}
+
+        </div>
+        </div>
+        <!----------------------------- SCRIPTS ----------------------------->
+        <!--Chatbot Test-->
+        <script 
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" 
+        crossorigin="anonymous">
+      </script>
+         <script
+         src="https://kit.fontawesome.com/2544a6d2ae.js"
+         crossorigin="anonymous"
+     ></script>
+      <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+      <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+      <script src="https://unpkg.com/vue@3"></script>
+        <script src="./scrips/aboutUs.js"></script>
+    </body>
+</html>

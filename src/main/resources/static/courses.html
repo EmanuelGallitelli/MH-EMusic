@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="./styles/animations.css" />
+    <link rel="stylesheet" href="./styles/styles.css" />
+    <title>Courses</title>
+  </head>
+
+  <body>
+        <div id="app">
+
+          <div v-show="charging==true" class="header black">
+            <div class="preloader--container fade-out">
+              <div
+                class="heartbeat d-flex align-items-center justify-content-center"
+              >
+                <img src="./assets/logo-01.png" class="w-50 h-50 p-3" alt="logo" />
+              </div>
+            <div class="spinner">
+            <span>L</span>
+            <span>E</span>
+            <span>T</span>
+            <span>S</span>
+            <span></span>
+            <span>R</span>
+            <span>O</span>
+            <span>C</span>
+            <span>K</span>
+            <span>!</span>
+          </div>
+        </div>
+      </div>
+
+      <div v-show="charging==false">
+          <header class="header bg-courses">
+            <nav class="nav slide-bottom">
+              <a href="./index.html"><img src="./assets/logo-nav.png" alt="logo" id="logo" class="logo-header"></a>
+              <div>
+                  <a class="underline-hover-effect ms-3 me-3" href="./index.html">Home</a>
+                  <a class="underline-hover-effect ms-3 me-3" href="./courses.html">Courses</a>
+                  <a class="underline-hover-effect ms-3 me-3" href="./merchandise.html">Merchandise</a>
+                  <a class="underline-hover-effect ms-3 me-3" href="./aboutUs.html">About us</a>
+              </div>
+              <div v-if="!isLogin">
+                  <a  href="./login.html" id="btn-login">Login</a>
+              </div>
+              <div v-else class="student-cart-container">
+                  <!------------------- Shop Car--------------------->
+                  <div class="cart">
+                      <div class="cart-amount">{{merchscart.length + coursescart.length}}</div>
+                      <!-- <img src="/assets/cart-01.png"> -->
+                      <a type="button" data-bs-toggle="offcanvas" href="#offcanvasRight" aria-controls="offcanvasExample">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-shopping-cart" width="32"
+                          height="32" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round"
+                          stroke-linejoin="round">
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                          <circle cx="6" cy="19" r="2" />
+                          <circle cx="17" cy="19" r="2" />
+                          <path d="M17 17h-11v-14h-2" />
+                          <path d="M6 5l14 1l-1 7h-13" />
+                        </svg>
+                      </a>
+                     
+                       
+                         <!-- ---------------------offcanvas shop car ---------------------------- -->
+                         <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+                          <div class="offcanvas-header">
+                            <h5 id="offcanvasRightLabel" class="font fs-2">My cart</h5>
+                            <i class="fa-solid fa-x deletes fs-2" v-on:click="deleteCartMerchs(merch)" data-bs-dismiss="offcanvas" aria-label="Close"></i>
+                          </div>
+                          <div class="offcanvas-body ">
+                            <table class="table">
+                              <thead>
+                                <tr>
+                                  <th scope="col">Name</th>
+                                  <th scope="col" class="text-center">Price</th>
+                                  <th scope="col" class="text-center">Units</th>
+                                  <th scope="col" class="text-center">Subtotal</th>
+                                  <th scope="col" class="text-center">Remove</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr v-for="merch in merchscart">
+                                  <td>{{merch.type}}</td>
+                                  <td class="text-center">${{merch.price}}</td>
+                                  <td><div id="contador" class="d-flex align-items-baseline justify-content-center">
+                                    <i class="fa-solid fa-minus me-2 deletes" v-on:click="disminuirUnidadesAComprar(merch)"></i>
+                                    <p class="text-center">{{merch.unidadesAComprar}}</p>
+                                    <i class="fa-solid fa-plus ms-2 text-center deletes" v-on:click="aumentarUnidadesAComprar(merch)"></i>
+
+                                  </div></td>
+                                  <td class="text-center">${{calcularSubtotalMerch(merch)}}</td>
+                                  <td class="text-center"><i class="fa-solid fa-x deletes" v-on:click="deleteCartMerchs(merch)"></i></td>
+                                </tr>
+                                <tr v-for="course in coursescart">
+                                  <td>{{course.name}}</td>
+                                  <td class="text-center">${{course.price}}</td>
+                                  <td></td>
+                                  <td class="text-center">${{calcularSubtotalCourse(course)}}</td>
+                                  <td class="text-center"><i class="fa-solid fa-x deletes " v-on:click="deleteCartCourse(course)"></i></td>
+                                </tr>
+                              </tbody>
+                            </table>
+                              <h4 class="mb-4"> Total to pay: ${{obtenerPrecioTotal()}}</h4>
+                            <a href="./checkout.html" class="checkout">Finish purchase</a>
+                          </div>
+                        </div>
+       
+                  </div>
+
+                  <div class="student-header-container">
+                    <p>{{firstName}}  {{lastName}}</p>
+                    <img :src="`./assets/${firstName.toLowerCase()}.png`" alt="student" >
+                    <ul >
+                        <li @click="logout" class="d-flex justify-content-between align-items-center"><i class="fa-solid fa-right-from-bracket me-2"></i><p>Logout</p></li>
+                        <li class="d-flex justify-content-between align-items-center"> <a href="./students.html">Dashboard</a></li>
+                    </ul>
+                </div>
+              </div>
+          </nav>
+            <div class="header-container-title slide-top">
+                <h1 class="header-title">Choose your course <span class="font">Now </span></h1>
+                <h2 class="header-title">and go for your dream </h2>
+                <p> he level required to tackle a course will always be well defined so that you can find your way. You can check the Progress Table at any time to see where you are!</p>
+            </div>
+        </header>
+        
+  <!------------ Cards Course ------------>
+  <main class="main-courses">
+     
+    <div class="page-courses slide-top">
+
+      <div class="courses-filter">
+          <ul class="filters-ul">
+            <li class="filters-li">LEVELS</li>
+            <li class="filters-li" @click="getAll">
+              <img alt="Level 4" src="/assets/skill-level-4.svg" class="level-img">
+              All
+            </li>
+            <li class="filters-li" @click="filterBy($event)" data-filter-by="beginner">
+
+              <img alt="Level 1" src="/assets/skill-level-1.svg" class="level-img">
+              Level 1
+
+            </li>
+            <li class="filters-li" @click="filterBy($event)" data-filter-by="middle">
+              <img alt="Level 2" src="/assets/skill-level-2.svg" class="level-img">
+              Level 2
+            </li>
+            <li class="filters-li" @click="filterBy($event)" data-filter-by="expert">
+              <img alt="Level 3" src="/assets/skill-level-3.svg" class="level-img">
+              Level 3
+            </li>
+            <li class="filters-li" @click="filterBy($event)" data-filter-by="level-4">
+              <img alt="Level 4" src="/assets/skill-level-4.svg" class="level-img">
+              Level 4
+            </li>
+            <li class="filters-li-divisor">COURSE TYPE</li>
+            <li class="filters-li" @click="getAll">
+              <img alt="Level 4" src="/assets/skill-level-4.svg" class="level-img">
+              All
+            </li>
+            <li class="filters-li" @click="filterBy($event)" data-filter-by="Guitar">
+              <img alt="Guitar" src="/assets/filter-icons-01.png" class="instrument-img">
+              Guitar
+            </li>
+            <li class="filters-li" @click="filterBy($event)" data-filter-by="Bass">
+              <img alt="Guitar bass" src="/assets/filter-icons-02.png" class="instrument-img">
+              Guitar Bass
+            </li>
+            <li class="filters-li" @click="filterBy($event)" data-filter-by="Drums">
+              <img alt="Drums" src="/assets/filter-icons-05.png" class="instrument-img">
+              Drums
+            </li>
+            <li class="filters-li" @click="filterBy($event)" data-filter-by="Sax">
+              <img alt="Sax" src="/assets/filter-icons-06.png" class="instrument-img">
+              Sax
+            </li>
+            <li class="filters-li" @click="filterBy($event)" data-filter-by="Sing">
+              <img alt="Sing" src="/assets/filter-icons-03.png" class="instrument-img">
+              Sing
+            </li>
+            <li class="filters-li" @click="filterBy($event)" data-filter-by="Piano">
+              <img alt="Piano" src="/assets/filter-icons-04.png" class="instrument-img">
+              Piano
+            </li>
+            <li class="filters-li-divisor">PRICE</li>
+            <li class="filters-li" @click="getAll">
+              <img alt="Level 4" src="/assets/skill-level-4.svg" class="level-img">
+              All
+            </li>
+              <li class="filters-li" @click="filterBy($event)">
+                <label>
+                  <input  type="radio" name="price" class="mx-2" value="0-10k" data-lower-price="0" data-higher-price="10000"
+                 > $0 - $10.000
+                </label>
+              </li>
+              <li class="filters-li" @click="filterBy($event)">
+                <label>
+                  <input  type="radio" name="price"  class="mx-2"  data-lower-price="10000" data-higher-price="20000"
+                   > $10.000 - $20.000
+                </label>
+              </li>
+              <li class="filters-li" @click="filterBy($event)">
+                <label>
+                  <input type="radio" name="price"  class="mx-2"   data-lower-price="20000" data-higher-price="30000"
+                   > $20.000 - $30.000
+                </label>
+              </li>
+              <li class="filters-li" @click="filterBy($event)">
+                <label>
+                  <input  type="radio" name="price"  class="mx-2" value="30k-40k" v-model="priceRange"  data-lower-price="40000" data-higher-price="50000"
+                   > $30.000 - $40.000
+                </label>
+              </li>
+              <li class="filters-li" @click="filterBy($event)">
+                <label>
+                  <input type="checkbox" class="mx-2" value="40k-50k" v-model="priceRange" data-lower-price="50000" data-higher-price="60000"
+                   > $40.000 - $50.000
+                </label>
+              </li>
+
+            <li class="filters-li-divisor">TEACHERS</li>
+            <li class="filters-li" @click="getAll">
+              <img alt="Level 4" src="/assets/skill-level-4.svg" class="level-img">
+              All
+            </li>
+            <div v-for="teacher in teachers">
+              <li class="filters-li"  @click="filterByTeacher(teacher.email)">
+                <img alt="Level 1" src="/assets/skill-level-4.svg" class="level-img">
+                {{teacher.firstName}} {{teacher.lastName}}
+              </li>
+            </div>
+          </ul>
+        </div>
+
+        <div class="courses-cards">
+          <!--Courses Card-->
+          <template v-if="filteredCourses.length > 0">
+            <div v-for="course in filteredCourses" class="courseCard">
+              <img src="./assets/new-fire.png" class="new-fire" id="fire">
+              <img v-if="course.name === 'Guitar'" class="courses_img" src="./assets/guitar.png" alt="Guitar player">
+              <img v-if="course.name === 'Drums'" class="courses_img" src="./assets/drums.png" alt="Drummer">
+              <img v-if="course.name === 'Sax'" class="courses_img" src="./assets/sax.png" alt="Saxophonist">
+              <img v-if="course.name === 'Sing'" class="courses_img" src="./assets/sing.png" alt="Singer">
+              <img v-if="course.name === 'Bass'" class="courses_img" src="./assets/bass.png" alt="Bass player">
+              <img v-if="course.name === 'Piano'" class="courses_img" src="./assets/piano.png" alt="Pianist">
+              <div class="content_courseCard">
+                <h2 class="bold">{{course.name}}</h2>
+                <ul class="p-0">
+                  <li>Duration: {{course.duration}} hs.</li>
+                  <li>Lessons: {{course.lessons}}</li>
+                  <li>Level: {{course.level}}</li>
+                  <li>Teacher: {{course.teacher.firstName}} {{course.teacher.lastName}}</li>
+                </ul>
+                <p class="price">${{course.price}}</p>
+                <figure v-on:click="cartCourses(course)">
+                  <img src="./assets/btn_buy_course-06-06.png">
+                  <figcaption>ADD TO THE CART
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-shopping-cart-plus"
+                      width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ce0202" fill="none"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <circle cx="6" cy="19" r="2" />
+                      <circle cx="17" cy="19" r="2" />
+                      <path d="M17 17h-11v-14h-2" />
+                      <path d="M6 5l6.005 .429m7.138 6.573l-.143 .998h-13" />
+                      <path d="M15 6h6m-3 -3v6" />
+                    </svg>
+                  </figcaption>
+                </figure>
+              </div>
+            </div>
+          </template>
+          <template v-else>
+            <div class="notCourses">
+              <h2>No se encontraron cursos</h2>
+            </div>
+          </template>
+          
+        </div>
+      </div>
+    </main>
+
+    <footer class="container-footer">
+
+      <div class="container-footer-col#1 col-3">
+        <img src="./assets/logo-nav.png" alt="logo" class="mb-4">
+        <ul class="d-flex flex-column gap-3 p-0">
+          <li>Copyright © 2021.</li>
+          <li>Emusic All rights reserved.</li>
+          <li class="d-flex gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-map-pin" width="20" height="20"
+              viewBox="0 0 24 24" stroke-width="1.5" stroke="#ce0202" fill="none" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <circle cx="12" cy="11" r="3" />
+              <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z" />
+            </svg>
+            Jl. Sunset Road No.815, Kuta.
+          </li>
+          <li class="d-flex gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-mail" width="20" height="20"
+              viewBox="0 0 24 24" stroke-width="1.5" stroke="#ce0202" fill="none" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <rect x="3" y="5" width="18" height="14" rx="2" />
+              <polyline points="3 7 12 13 21 7" />
+            </svg>
+            support@emusic.com
+          </li>
+          <li class="d-flex gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-phone-call" width="20"
+              height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ce0202" fill="none" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path
+                d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2" />
+              <path d="M15 7a2 2 0 0 1 2 2" />
+              <path d="M15 3a6 6 0 0 1 6 6" />
+            </svg>(+62)81 6754 345
+          </li>
+        </ul>
+      </div>
+
+      <div class="container-footer-col#2 col-3">
+        <ul class="d-flex flex-column gap-3 p-0">
+          <h3 class="bold">GOT LOST?</h3>
+          <li><a href="http://">Home</a></li>
+          <li><a href="http://">Student's Profile</a></li>
+          <li><a href="http://">Teacher's Room</a></li>
+          <li><a href="http://">Courses</a></li>
+          <li><a href="http://">Merchandise</a></li>
+          <li><a href="http://">About Us</a></li>
+        </ul>
+      </div>
+
+      <div class="container-footer-col#3 col-3">
+        <ul class="d-flex flex-column gap-3 p-0">
+          <h3 class="bold">ABOUT EMUSIC</h3>
+          <li><a href="http://">FAQ</a></li>
+          <li><a href="http://">Privicy Policy</a></li>
+          <li><a href="http://">Terms & Condition</a></li>
+          <li><a href="http://">Support</a></li>
+        </ul>
+      </div>
+
+      <div class="container-footer-col#4 col-3">
+        <h3 class="bold">FOLLOW US</h3>
+        <ul class="d-flex gap-4 p-0">
+          <li><a href="https://www.facebook.com/profile.php?id=100083025423365"><img src="./assets/facebook.png" alt="facebook" class="social"></a></li>
+          <li><a href="https://www.instagram.com/emusicmindhub/"><img src="./assets/instagram.png" alt="instagram" class="social"></a></li>
+          <li><a href="https://twitter.com/EMusicMindHub"><img src="./assets/twitter.png" alt="twitter" class="social"></a></li>
+          <li><a href="https://www.youtube.com/channel/UC2nJJf25rRyHdYqcdxUoMwQ"><img src="./assets/youtube.png" alt="youtube" class="social"></a></li>
+      </ul>
+        <form class="subscribe-footer">
+          Subscribe our Newsletter
+          <input type="email" placeholder="@" class="newsletter-input">
+          <div class="subscribe-btns">
+            <button type="button" class="buscribe-btn" @click="subscribeEmail()">Subscribe</button>
+          </div>
+
+          </div>
+        </main>
+      </div>
+      {{scroll}} {{ headershow }}
+    </div>
+
+    <!----------------------------- SCRIPTS ----------------------------->
+    <!--Chatbot Test-->
+    <script src="https://web.chatrace.com/webchat/plugin.js"></script>
+    <script>
+      ktt10.setup({ pageId: 107945601966944, color: "#ce0202" });
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://kit.fontawesome.com/2544a6d2ae.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/vue@3"></script>
+    <script src="./scrips/courses.js"></script>
+  </body>
+</html>

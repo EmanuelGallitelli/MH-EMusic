@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E music school - Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="./managerStyle.css">
+</head>
+<body>
+    <div id="app">
+        
+        <h1 class="text-center">Panel controller</h1>
+        <div class="d-flex">
+            <div class="d-flex flex-column controllerContainer">
+                <h3>Merch controller</h3>
+                <div class="d-flex elementsControllerContainer">
+    
+                    <form v-on:submit.prevent = "addNewMerch()">
+                        <h4>Add new merch</h4>
+                        <div class="mb-2">
+                            <label for="type">Type:</label>   
+                            <input type="text" id="type" v-model="merchType" required>   
+                        </div>
+                        <div class="mb-2">
+                            <label for="stock">Stock:</label>
+                            <input type="number" id="stock" v-model="merchStock" required>
+                        </div>
+                        <div class="mb-2">
+                            <label for="price">Price: $</label>
+                            <input type="number" id="price" v-model="merchPrice" required>
+                        </div>
+                        <div class="mb-2">
+                            <label for="waist">Waist:</label>
+                            <select name="waist" id="waist" v-model="merchWaist">
+                                <option value="s">S</option>
+                                <option value="m">M</option>
+                                <option value="l">L</option>
+                                <option value="xl">XL</option>
+                                <option value="df">No Waist</option>
+                            </select>
+                        </div>
+                        <button type="submit">Add merch</button> 
+                    </form>
+                    <div>
+                        <h4>Merchs info</h4>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Stock</th>
+                                    <th>Price</th>
+                                    <th>Waist</th>
+                                    <th>Edit</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="merch in merchList">
+                                    <td>{{merch.type}}</td>
+                                    <td>{{merch.stock}}</td>
+                                    <td>$ {{merch.price}}</td>
+                                    <td>{{merch.waist}}</td>
+                                    <td><button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editMerch" v-on:click="preloadDataModal(merch)"></button></td>
+                                    <td><button type="button" class="btn btn-close" v-on:click="deleteMerch(merch.id)"></button></td>
+                                </tr>
+                            </tbody>
+                        </table> 
+                        <!-- MODAL -->
+                        <div class="modal fade" id="editMerch" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <h5 class="modal-title" style="color: black" id="exampleModalLabel">Editr merch</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form>
+                                        <div class="mb-2">
+                                            <label for="type">Type:</label>   
+                                            <input type="text" id="type" v-model="merchTypeModal" required>   
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="stock">Stock:</label>
+                                            <input type="number" id="stock" v-model="merchStockModal" required>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="price">Price:</label>
+                                            <input type="number" id="price" v-model="merchPriceModal" required>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="waist">Waist:</label>
+                                            <select name="waist" id="waist" v-model="merchWaistModal">
+                                                <option value="s">S</option>
+                                                <option value="m">M</option>
+                                                <option value="l">L</option>
+                                                <option value="xl">XL</option>
+                                                <option value="df">No Waist</option>
+                                            </select>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-primary" v-on:click="editMerch()">Confirm</button> 
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex flex-column controllerContainer">
+                <h3>Courses controller</h3>
+                <div class="d-flex elementsControllerContainer">
+    
+                    <form v-on:submit.prevent = "addNewCourse()">
+                        <h4>Add new course</h4>
+                        <div class="mb-2">
+                            <label for="courseName">Name:</label>   
+                            <input type="text" id="courseName" v-model="courseName" required>   
+                        </div>
+                        <div class="mb-2">
+                            <label for="courseLevel">Level:</label>
+                            <input type="text" id="courseLevel" v-model="courseLevel" required>
+                        </div>
+                        <div class="mb-2">
+                            <label for="courseNumberLessons">Number of lessons</label>
+                            <input type="number" id="courseNumberLessons" v-model="courseNumberLessons" required>
+                        </div>
+                        <div class="mb-2">
+                            <label for="coursePrice">Price: $</label>
+                            <input type="number" id="coursePrice" v-model="coursePrice" required>
+                        </div>
+                        <div class="mb-2">
+                            <label for="courseDuration">Duration (minutes):</label>
+                            <input type="number" id="courseDuration" v-model="courseDuration" required>
+                        </div>
+                        <div class="mb-2">
+                            <label for="courseTeacherId">Teacher:</label>
+                            <select name="courseTeacherId" id="courseTeacherId" v-model="courseTeacherId">
+                                <option v-for="teacher in teachersList" :value="teacher.id">{{teacher.firstName}} {{teacher.lastName}}</option>
+                            </select>
+                        </div>
+                        <button type="submit">Add course</button> 
+                    </form>
+
+                    <div>
+                        <h4>Courses info</h4>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Level</th>
+                                    <th>Lessons</th>
+                                    <th>Duration (minutes)</th>
+                                    <th>Price</th>
+                                    <th>Teacher</th>
+                                    <th>Edit</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="course in coursesList">
+                                    <td>{{course.name}}</td>
+                                    <td>{{course.level}}</td>
+                                    <td>{{course.lessons}}</td>
+                                    <td>{{course.duration}}</td>
+                                    <td>{{course.price}}</td>
+                                    <td>{{course.teacher.firstName}} {{course.teacher.lastName}}</td>
+                                    <td><button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editCurse" v-on:click="preloadDataModalCourse(course)"></button></td>
+                                    <td><button type="button" class="btn btn-close" v-on:click="deleteCourse(course.id)"></button></td>
+                                </tr>
+                            </tbody>
+                        </table> 
+                        
+                         <div class="modal fade" id="editCurse" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <h5 class="modal-title" style="color: black" id="exampleModalLabel">Editr curse</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form>
+                                        <div class="mb-2">
+                                            <label for="courseName">Name:</label>   
+                                            <input type="text" id="courseName" v-model="courseNameModal" required>   
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="courseLevel">Level:</label>
+                                            <input type="text" id="courseLevel" v-model="courseLevelModal" required>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="courseNumberLessons">Number of lessons</label>
+                                            <input type="number" id="courseNumberLessons" v-model="courseNumberLessonsModal" required>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="coursePrice">Price: $</label>
+                                            <input type="number" id="coursePrice" v-model="coursePriceModal" required>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="courseDuration">Duration (minutes):</label>
+                                            <input type="number" id="courseDuration" v-model="courseDurationModal" required>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="courseTeacherId">Teacher:</label>
+                                            <select name="courseTeacherId" id="courseTeacherId" v-model="courseTeacherIdModal">
+                                                <option v-for="teacher in teachersList" :value="teacher.id">{{teacher.firstName}} {{teacher.lastName}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-primary" v-on:click="editCourse()">Confirm</button> 
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div> 
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex flex-column controllerContainer">
+            <h3>Profesor controller</h3>
+            <div class="d-flex elementsControllerContainer">
+                <form v-on:submit.prevent = "addNewTeacher()">
+                    <h4>Add new teacher</h4>
+                    <div class="mb-2">
+                        <label for="teacher">First name:</label>   
+                        <input type="text" id="teacherName" v-model="teacherName" required>   
+                    </div>
+                    <div class="mb-2">
+                        <label for="teacherLastName">Last name:</label>
+                        <input type="text" id="stock" v-model="teacherLastName" required>
+                    </div>
+                    <div class="mb-2">
+                        <label for="teacherEmail">Email:</label>
+                        <input type="email" id="teacherEmail" v-model="teacherEmail" required>
+                    </div>
+                    <div class="mb-2">
+                        <label for="teacherPassword">Password:</label>
+                        <input type="text" id="teacherPassword" v-model="teacherPassword" required>
+                    </div>
+                    <div class="mb-2">
+                        <label for="teacherSubject">Subject:</label>
+                        <input type="text" id="teacherSubject" v-model="teacherSubject" required>
+                    </div>
+                    <button type="submit">Add teacher</button> 
+                </form>
+
+                <div>
+                    <h4>Teachers info</h4>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Email</th>
+                                <th>Subject</th>
+                                <th>Edit</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="teacher in teachersList">
+                                <td>{{teacher.firstName}}</td>
+                                <td>{{teacher.lastName}}</td>
+                                <td>{{teacher.email}}</td>
+                                <td>{{teacher.subject}}</td>
+                                <td><button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editTeacher" v-on:click="preloadDataModalTeacher(teacher)"></button></td>
+                                <td><button type="button" class="btn btn-close" v-on:click="deleteTeacher(teacher.id)"></button></td>
+                            </tr>
+                        </tbody>
+                    </table> 
+                    
+                     <div class="modal fade" id="editTeacher" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <h5 class="modal-title" style="color: black" id="exampleModalLabel">Editr curse</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form>
+                                    <div class="mb-2">
+                                        <label for="teacherEmail">Email:</label>   
+                                        <input type="text" id="teacherEmail" v-model="teacherEmailModal" required>   
+                                    </div>
+                                    {{teacherEmailModal}}{{teacherPasswordModal}}
+                                    <div class="mb-2">
+                                        <label for="teacherPassword">Password:</label>
+                                        <input type="text" id="teacherPassword" v-model="teacherPasswordModal">
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="teacherSubject">Subject:</label>
+                                        <input type="text" id="teacherSubject" v-model="teacherSubjectModal" required>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary" v-on:click="editTeacher()">Confirm</button> 
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div> 
+
+            </div>
+        </div>
+       
+    </div>  
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/vue@3"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="./manager.js"></script>
+</body>
+</html>
